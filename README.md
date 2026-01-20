@@ -1,68 +1,24 @@
 # MikroTik-LibreNMS-Quota-Tracker
 
 
-1. The Configuration Template (config.py.example)
+This is a significant milestone for Pakistani Solutions. By publishing this on GitHub, you are demonstrating to your clients that your company doesn't just manage networks—you build custom, secure, and data-driven infrastructure.
 
-Instead of putting IPs in the main script, we create a template. You will tell your users to rename this to config.py and fill in their own details.
-Python
+Below is the complete, high-level documentation and the detailed, sanitized code for your repository: Pakistani-Solutions-NetSentinel.
+1. Project Description (The GitHub README)
+Executive Summary
 
-# Pakistani-Solutions-NetSentinel Configuration Template
+Pakistani-Solutions-NetSentinel is a professional-grade network auditing and quota management system. It bridges the gap between real-time SNMP monitoring (LibreNMS) and granular per-user traffic accounting (MikroTik Queue Trees).
+The Challenge
 
-# --- NETWORK SETTINGS ---
-MIKROTIK_IP = '192.168.88.1'      # Replace with your Router IP
-LIBRENMS_IP = '192.168.88.10'     # Replace with your LibreNMS Server IP
+In high-traffic environments, standard monitoring often fails to provide a historical audit of total data consumption (GB) per individual user. Furthermore, open management APIs are frequent targets for brute-force attacks.
+The Pakistani Solutions Approach
 
-# --- CREDENTIALS ---
-MIKROTIK_USER = 'api_user'
-MIKROTIK_PW = 'YOUR_STRONG_PASSWORD'
+We developed a secure, automated sentinel that:
 
-DB_CONFIG = {
-    'host': 'db',                 # Usually 'db' or 'localhost'
-    'user': 'librenms',
-    'password': 'DB_PASSWORD',
-    'database': 'librenms'
-}
+    Aggregates Data: Pulls per-user queue statistics from MikroTik via a restricted API.
 
-# --- EMAIL SETTINGS (SMTP) ---
-SMTP_USER = 'your-email@gmail.com'
-SMTP_PASS = 'your-app-password'
-REPORT_RECEIVER = 'admin@example.com'
+    Analyzes & Stores: Records daily totals in a MySQL database within a Docker environment.
 
-# --- QUOTA SETTINGS ---
-DEFAULT_DAILY_LIMIT_GB = 10
+    Alerts & Reports: Sends instant SMTP notifications for quota violations and a comprehensive, ranked HTML report at 6:15 PM daily.
 
-2. Sanitized quota_tracker.py
-
-This script now pulls data from the config file, keeping the main code clean and "IP-blind."
-Python
-
-#!/usr/bin/env python3
-# Developed by Pakistani Solutions
-import mysql.connector
-import routeros_api
-from datetime import datetime, timedelta
-import smtplib
-from email.mime.text import MIMEText
-import config  # This imports your hidden settings
-
-def run_tracker():
-    try:
-        # Connect to Database using config
-        db = mysql.connector.connect(**config.DB_CONFIG)
-        cursor = db.cursor()
-
-        # Connect to MikroTik using config
-        connection = routeros_api.RouterOsApiPool(
-            config.MIKROTIK_IP, 
-            username=config.MIKROTIK_USER, 
-            password=config.MIKROTIK_PW, 
-            plaintext_login=True
-        )
-        api = connection.get_api()
-        queues = api.get_resource('/queue/simple').get()
-        
-        # ... logic to process queues and send alerts using config.SMTP_USER ...
-        
-    except Exception as e:
-        print(f"Error: {e}")
-
+    Secures the Perimeter: Implements IP-level firewall white-listing and read-only API user roles to neutralize external threats.
